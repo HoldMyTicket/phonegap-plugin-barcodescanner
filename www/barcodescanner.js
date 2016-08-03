@@ -120,6 +120,23 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
                 config
             );
         };
+        
+        BarcodeScanner.prototype.dismiss = function (successCallback, errorCallback) {
+          
+          exec(
+              function(result) {
+                  scanInProgress = false;
+                  successCallback(result);
+              },
+              function(error) {
+                  scanInProgress = false;
+                  errorCallback(error);
+              },
+              'BarcodeScanner',
+              'dismiss'
+          );
+          
+        };
 
         //-------------------------------------------------------------------
         BarcodeScanner.prototype.encode = function (type, data, successCallback, errorCallback, options) {

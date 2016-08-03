@@ -46,6 +46,7 @@
 @interface CDVBarcodeScanner : CDVPlugin {}
 - (NSString*)isScanNotPossible;
 - (void)scan:(CDVInvokedUrlCommand*)command;
+- (void)dismiss:(CDVInvokedUrlCommand*)command;
 - (void)encode:(CDVInvokedUrlCommand*)command;
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback;
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback;
@@ -181,6 +182,16 @@
     processor.formats = options[@"formats"];
 
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
+}
+
+- (void)dismiss:(CDVInvokedUrlCommand*)command {
+    self.capturing = NO;
+    [self.captureSession stopRunning];
+    [self.parentViewController dismissViewControllerAnimated:YES completion:callbackBlock];
+    
+    // viewcontroller holding onto a reference to us, release them so they
+    // will release us
+    self.viewController = nil;
 }
 
 //--------------------------------------------------------------------------
