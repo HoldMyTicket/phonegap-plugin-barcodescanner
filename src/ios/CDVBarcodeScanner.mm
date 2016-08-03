@@ -185,13 +185,7 @@
 }
 
 - (void)dismiss:(CDVInvokedUrlCommand*)command {
-    self.capturing = NO;
-    [self.captureSession stopRunning];
-    [self.parentViewController dismissViewControllerAnimated:YES completion:callbackBlock];
-    
-    // viewcontroller holding onto a reference to us, release them so they
-    // will release us
-    self.viewController = nil;
+  [processor performSelector:@selector(barcodeScanDone) withObject:nil afterDelay:0];
 }
 
 //--------------------------------------------------------------------------
