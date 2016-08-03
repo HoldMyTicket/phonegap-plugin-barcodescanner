@@ -185,7 +185,51 @@
 }
 
 - (void)dismiss:(CDVInvokedUrlCommand*)command {
-  [processor performSelector:@selector(barcodeScanDone) withObject:nil afterDelay:0];
+
+    NSLog(@"DISMISSSSS");
+    
+    CDVbcsProcessor* processor;
+    NSString*       callback;
+    NSString*       capabilityError;
+    
+    callback = command.callbackId;
+    
+    NSDictionary* options = command.arguments.count == 0 ? [NSNull null] : [command.arguments objectAtIndex:0];
+    
+    if ([options isKindOfClass:[NSNull class]]) {
+        options = [NSDictionary dictionary];
+    }
+    BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
+    BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
+    // We allow the user to define an alternate xib file for loading the overlay.
+    NSString *overlayXib = [options objectForKey:@"overlayXib"];
+    
+    capabilityError = [self isScanNotPossible];
+    if (capabilityError) {
+        [self returnError:capabilityError callback:callback];
+        return;
+    }
+    
+    processor = [[CDVbcsProcessor alloc]
+                 initWithPlugin:self
+                 callback:callback
+                 parentViewController:self.viewController
+                 alterateOverlayXib:overlayXib
+                 ];
+    // queue [processor scanBarcode] to run on the event loop
+    
+    if (preferFrontCamera) {
+        processor.isFrontCamera = true;
+    }
+    
+    if (showFlipCameraButton) {
+        processor.isShowFlipCameraButton = true;
+    }
+    
+    processor.formats = options[@"formats"];
+    
+    [processor performSelector:@selector(barcodeScanCancelled) withObject:nil afterDelay:0];
+    
 }
 
 //--------------------------------------------------------------------------
